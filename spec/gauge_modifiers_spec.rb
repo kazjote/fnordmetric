@@ -413,6 +413,44 @@ describe "increment three-dimensional gagues" do
 
   end
 
+  context "when there are some conditions" do
+    let(:gauge_key) { "fnordmetrics-myns-gauge-mygauge_1463-10-695280200" }
+    let(:event) { event = { :_time => @now, :_session_key => "mysesskey" } }
+
+    let(:gauge) do
+      FnordMetric::Gauge.new(
+        :key => "mygauge_1463",
+        :key_prefix => "fnordmetrics-myns",
+        :three_dimensional => true,
+        :tick => 10).tap do |gauge|
+        gauge.stub(:conditions => [condition])
+      end
+    end
+
+    let(:context) do
+      action = proc {set_field(:mygauge_1463, "asdasdkey", 23) }
+      FnordMetric::Context.new({:gauges => { :mygauge_1463 => gauge } }, action)
+    end
+
+    #TODO Testcase should include tests for each action (not only set_field)
+    context "when condition is met" do
+      let(:condition) { mock(:condition, :met? => true) }
+
+      it "should perform given action" do
+        context.call(event, @redis_wrap)
+        @redis.zscore(gauge_key, "asdasdkey").should == "23"
+      end
+    end
+
+    context "when condition is not met" do
+      let(:condition) { mock(:condition, :met? => false) }
+
+      it "should not perform any actions" do
+        context.call(event, @redis_wrap)
+        @redis.zscore(gauge_key, "asdasdkey").should_not == "23"
+      end
+    end
+  end
 
   it "should raise an error if incr_field is called on a 2d gauge"
 

@@ -3,7 +3,7 @@ module FnordMetric::GaugeModifiers
   def incr(gauge_name, value=1)
     gauge = fetch_gauge(gauge_name)
     assure_two_dimensional!(gauge)
-    return unless gauge.conditions.all? {|c| c.met? session_key }
+    return unless conditions_met?(gauge)
     if gauge.unique? 
       incr_uniq(gauge, value)
     elsif gauge.average? 
@@ -48,6 +48,7 @@ module FnordMetric::GaugeModifiers
   def incr_field(gauge_name, field_name, value=1)
     gauge = fetch_gauge(gauge_name)
     assure_three_dimensional!(gauge)
+    return unless conditions_met?(gauge)
     if gauge.unique? 
       incr_uniq(gauge, value, field_name)
     else
@@ -64,14 +65,21 @@ module FnordMetric::GaugeModifiers
   def set_value(gauge_name, value)
     gauge = fetch_gauge(gauge_name)
     assure_two_dimensional!(gauge)
+    return unless conditions_met?(gauge)
     @redis.hset(gauge.key, gauge.tick_at(time), value)
   end
 
   def set_field(gauge_name, field_name, value)
     gauge = fetch_gauge(gauge_name)
     assure_three_dimensional!(gauge)
+    return unless conditions_met?(gauge)
     @redis.zadd(gauge.tick_key(time), value, field_name)
   end
 
+  protected
+
+  def conditions_met?(gauge)
+    gauge.conditions.all? {|c| c.met? session_key }
+  end
 
 end
