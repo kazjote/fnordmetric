@@ -11,6 +11,14 @@ FnordMetric.namespace :ulm do
   gauge :pageviews_hourly_unique, :tick => 1.hour.to_i, :unique => true, :title => "Unique Visits (Hourly)"
   gauge :pageviews_monthly_unique, :tick => 40.days.to_i, :unique => true, :title => "Unique Visits (Month)"
 
+  gauge :retention_1_day, {
+    :tick => 1.day.to_i,
+    :unique => true,
+    :title => "Retention 1 day",
+    :conditions => [
+      { :related_gauge => :pageviews_daily_unique, :done_ago => 1.day.to_i } ]
+  }
+
   gauge :messages_sent, :tick => 1.day.to_i, :title => "Messages (sent)"
   gauge :messages_read, :tick => 1.day.to_i, :title => "Messages (read)"
   gauge :winks_sent, :tick => 1.day.to_i, :title => "Winks sent"
@@ -29,6 +37,7 @@ FnordMetric.namespace :ulm do
     incr :pageviews_daily_unique
     incr :pageviews_hourly_unique
     incr :pageviews_monthly_unique
+    incr :retention_1_day
     incr_field :pageviews_per_url_daily, data[:url]
     incr_field :pageviews_per_url_monthly, data[:url]
   end
@@ -77,6 +86,16 @@ FnordMetric.namespace :ulm do
     :type => :timeline,
     :width => 67,
     :gauges => :pageviews_daily_unique,
+    :include_current => true,
+    :autoupdate => 30
+  }
+
+
+  widget 'Overview', {
+    :title => "Retention 1 day",
+    :type => :timeline,
+    :width => 67,
+    :gauges => :retention_1_day,
     :include_current => true,
     :autoupdate => 30
   }

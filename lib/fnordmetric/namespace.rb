@@ -16,7 +16,10 @@ class FnordMetric::Namespace
 
   def ready!(redis)
     @redis = redis
-    @gauges.map{ |k,g| g.add_redis(@redis) }
+    @gauges.map do |k,gauge|
+      gauge.initialize_conditions(@gauges)
+      gauge.add_redis(@redis)
+    end
     self
   end
 
