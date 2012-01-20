@@ -78,7 +78,7 @@ describe FnordMetric::Gauge do
       end
 
       context "when related gauges has been associated" do
-        before { gauge.initialize_conditions({"speed_increase" => related_gauge}) }
+        before { gauge.initialize_conditions({:speed_increase => related_gauge}) }
 
         specify { subject.size.should == 1 }
 
