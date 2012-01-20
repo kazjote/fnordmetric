@@ -3,6 +3,7 @@ module FnordMetric::GaugeModifiers
   def incr(gauge_name, value=1)
     gauge = fetch_gauge(gauge_name)
     assure_two_dimensional!(gauge)
+    return unless gauge.conditions.all? {|c| c.met? session_key }
     if gauge.unique? 
       incr_uniq(gauge, value)
     elsif gauge.average? 

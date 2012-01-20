@@ -49,6 +49,50 @@ describe FnordMetric::Gauge do
   	gauge.key(:fnord).should == "fnordmetrics-myns-gauge-mygauge-23-fnord"
   end
 
+  describe "conditions" do
+    subject { gauge.conditions }
+
+    context "when none are specified" do
+      let(:gauge) { FnordMetric::Gauge.new({:key => "a", :key_prefix => "b"}) }
+
+      before { gauge.initialize_conditions([]) }
+
+      it { should == [] }
+    end
+
+    context "when some are specified" do
+      let(:gauge) do
+        FnordMetric::Gauge.new({:key => "a", :key_prefix => "b", :conditions =>
+          [:related_gauge => "speed_increase",
+           :done_ago => 1.day]})
+      end
+
+      let(:related_gauge) do
+        FnordMetric::Gauge.new({:key => "speed_increase", :key_prefix => "b"})
+      end
+
+      context "when related gauges has not been associated" do
+        it "should raise an exception" do
+          lambda { subject }.should raise_exception
+        end
+      end
+
+      context "when related gauges has been associated" do
+        before { gauge.initialize_conditions({"speed_increase" => related_gauge}) }
+
+        specify { subject.size.should == 1 }
+
+        describe "returned gauge condition" do
+          subject { gauge.conditions.first }
+
+          specify { subject.related_gauge.should == related_gauge }
+          specify { subject.operand.should == :done_ago }
+          specify { subject.value.should == 1.day }
+        end
+      end
+    end
+  end
+
   describe "ticks" do
 
     it "should return the correct tick if configured" do

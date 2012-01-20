@@ -421,7 +421,8 @@ private
   def create_gauge_context(opts, block)
     gauge = FnordMetric::Gauge.new({
       :key_prefix => "fnordmetrics-myns"
-    }.merge(opts))      
+    }.merge(opts))
+    gauge.initialize_conditions({})
     FnordMetric::Context.new({
       :gauges => { opts[:key].intern => gauge }
     }, block) 
