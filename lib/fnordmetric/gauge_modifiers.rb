@@ -72,7 +72,7 @@ module FnordMetric::GaugeModifiers
   protected
 
   def conditions_met?(gauge)
-    gauge.conditions.all? {|c| c.met?(session_key, @redis) }
+    gauge.conditions.all? {|c| c.met?(@event, @redis) }
   end
 
 end

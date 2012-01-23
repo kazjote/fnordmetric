@@ -13,6 +13,7 @@ describe FnordMetric::GaugeCondition do
     end
 
     let(:current_time) { Time.now }
+    let(:event) { { :_session_key => "session_1", :_time => current_time.to_i } }
     let(:current_tick) { related_gauge.tick_at(current_time) }
 
     subject do
@@ -22,7 +23,7 @@ describe FnordMetric::GaugeCondition do
     end
 
     context "when required event has not happend in the past" do
-      specify { subject.met?("session_1", redis).should_not be_true }
+      specify { subject.met?(event, redis).should_not be_true }
     end
 
     context "when required event happened in the past" do
@@ -31,7 +32,7 @@ describe FnordMetric::GaugeCondition do
         redis.sadd(key, "session_1")
       end
 
-      specify { subject.met?("session_1", redis).should be_true }
+      specify { subject.met?(event, redis).should be_true }
     end
 
     context "when required event happened in the past in the wrong moment" do
@@ -40,7 +41,7 @@ describe FnordMetric::GaugeCondition do
         redis.sadd(key, "session_1")
       end
 
-      specify { subject.met?("session_1", redis).should be_false }
+      specify { subject.met?(event, redis).should be_false }
     end
   end
 end

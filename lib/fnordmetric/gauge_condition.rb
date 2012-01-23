@@ -8,9 +8,11 @@ module FnordMetric
       self.value = opts[operand]
     end
 
-    def met?(session_key, redis)
-      key = related_gauge.tick_key(Time.now.to_i - value, :sessions)
-      redis.sismember(key, session_key)
+    def met?(event, redis)
+      session_key = event[:_session_key]
+      time = event[:_time]
+      redis_set_key = related_gauge.tick_key(time - value, :sessions)
+      redis.sismember(redis_set_key, session_key)
     end
   end
 end
