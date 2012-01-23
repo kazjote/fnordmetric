@@ -92,19 +92,19 @@ FnordMetric.namespace :ulm do
 
 
   widget 'Overview', {
-    :title => "Retention 1 day",
+    :title => "Unique Visits per Hour",
     :type => :timeline,
-    :width => 67,
-    :gauges => :retention_1_day,
+    :width => 33,
+    :gauges => :pageviews_hourly_unique,
     :include_current => true,
     :autoupdate => 30
   }
 
   widget 'Overview', {
-    :title => "Unique Visits per Hour",
+    :title => "Retention 1 day",
     :type => :timeline,
-    :width => 33,
-    :gauges => :pageviews_hourly_unique,
+    :width => 100,
+    :gauges => :retention_1_day,
     :include_current => true,
     :autoupdate => 30
   }
