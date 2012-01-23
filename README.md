@@ -154,6 +154,22 @@ Call these methods from the event-handler block
 
 ### Options: Gauges ###
 
++ `conditions` conditions that should be met in order to increase given Gauge. If you specify many conditions they will be connected with AND operator.
+
+Currently, only one type of condition is implemented.
+
+This example condition will make the gauge incremented only when:
+
++ \_session key is specified for event that increments the gauge
++ some event with the same \_session was used to increment gauge :pageviews_daily_unique 1 day ago
+
+```js
+:conditions => [
+  { :related_gauge => :pageviews_daily_unique, :done_ago => 1.day.to_i } ]
+```
+
+Note that :pageviews_daily_unique gauge needs to be uniq. It allows to implement simple retention graphs. See doc/full_example.txt for 1 day retention graph.
+
 ----
 
 ### Options: Widgets ###
